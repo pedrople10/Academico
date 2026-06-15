@@ -1,0 +1,29 @@
+## .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.userosscache
+*.suo
+
+## Rider
+.idea/
+
+## VS Code
+.vscode/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+## Migrations geradas localmente podem ser versionadas;
+## descomente a linha abaixo se NÃO quiser versioná-las
+# Migrations/
+
+## SQL LocalDB
+*.mdf
+*.ldf
