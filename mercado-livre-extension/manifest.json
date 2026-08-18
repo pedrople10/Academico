@@ -3,7 +3,7 @@
   "name": "Anúncios ML por Imagem",
   "description": "Envie fotos de um produto e a extensão gera e publica o anúncio no Mercado Livre automaticamente usando IA.",
   "version": "1.0.0",
-  "default_locale": "pt_BR",
+  
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
