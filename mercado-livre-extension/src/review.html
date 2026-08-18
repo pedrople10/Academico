@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Revisar anúncio — Anúncios ML por Imagem</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="review.css" />
+  </head>
+  <body>
+    <div class="page" id="page">
+      <h1>Revise antes de publicar</h1>
+      <p class="muted">
+        A IA sugeriu os dados abaixo a partir das fotos. Confira tudo — em
+        especial preço e categoria — antes de publicar no Mercado Livre.
+      </p>
+
+      <div id="notes"></div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Fotos</h2>
+          <div id="imageGallery" class="thumbs"></div>
+        </section>
+
+        <section class="card">
+          <h2>Categoria</h2>
+          <div class="field">
+            <label for="categoryQuery">Buscar categoria por termo</label>
+            <div class="copy-row">
+              <input id="categoryQuery" type="text" />
+              <button id="searchCategoryBtn" class="btn-secondary">Buscar</button>
+            </div>
+          </div>
+          <div id="categoryResult" class="muted"></div>
+          <div class="field">
+            <label for="categoryId">ID da categoria (ML)</label>
+            <input id="categoryId" type="text" placeholder="Ex: MLB1055" />
+          </div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>Anúncio</h2>
+        <div class="field">
+          <label for="title">Título (máx. 60 caracteres)</label>
+          <input id="title" type="text" maxlength="60" />
+          <span id="titleCount" class="muted"></span>
+        </div>
+
+        <div class="field">
+          <label for="description">Descrição</label>
+          <textarea id="description" rows="6"></textarea>
+        </div>
+
+        <div class="row-3">
+          <div class="field">
+            <label for="price">Preço (R$)</label>
+            <input id="price" type="number" min="0" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="quantity">Quantidade</label>
+            <input id="quantity" type="number" min="1" step="1" value="1" />
+          </div>
+          <div class="field">
+            <label for="condition">Condição</label>
+            <select id="condition">
+              <option value="new">Novo</option>
+              <option value="used">Usado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="listingTypeId">Tipo de anúncio</label>
+          <select id="listingTypeId">
+            <option value="gold_special">Clássico</option>
+            <option value="gold_pro">Premium</option>
+            <option value="free">Grátis (se disponível)</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Ficha técnica (atributos exigidos pela categoria)</h2>
+        <div id="attributesList" class="muted">
+          Selecione uma categoria para ver os atributos exigidos.
+        </div>
+        <div id="aiHints" class="ai-hints"></div>
+      </section>
+
+      <div class="publish-row">
+        <button id="publishBtn" class="btn-primary">Publicar no Mercado Livre</button>
+        <span id="publishMessage" class="muted"></span>
+      </div>
+
+      <div id="messageArea"></div>
+      <div id="resultArea"></div>
+    </div>
+    <script type="module" src="review.js"></script>
+  </body>
+</html>

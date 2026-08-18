@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Anúncios ML por Imagem</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="popup">
+      <header class="popup-header">
+        <h1>Anúncio por Imagem</h1>
+        <button id="openOptions" class="icon-btn" title="Configurações">⚙️</button>
+      </header>
+
+      <div id="statusRow" class="status-row"></div>
+
+      <div id="dropZone" class="drop-zone">
+        <p><strong>Arraste as fotos do produto aqui</strong></p>
+        <p class="muted">ou clique para selecionar (você pode enviar várias)</p>
+        <input id="fileInput" type="file" accept="image/*" multiple hidden />
+      </div>
+
+      <div id="thumbs" class="thumbs"></div>
+
+      <button id="generateBtn" class="btn-primary full-width" disabled>
+        Gerar anúncio com IA
+      </button>
+
+      <div id="messageArea"></div>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

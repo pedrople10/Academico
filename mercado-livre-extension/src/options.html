@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Configurações — Anúncios ML por Imagem</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="page">
+      <h1>Configurações</h1>
+
+      <section class="card">
+        <h2>1. App do Mercado Livre</h2>
+        <p class="muted">
+          Crie uma aplicação em
+          <strong>developers.mercadolivre.com.br</strong> e cole os dados
+          abaixo. Use a Redirect URI exibida aqui no cadastro do app.
+        </p>
+
+        <div class="field">
+          <label>Redirect URI (cole no app do Mercado Livre)</label>
+          <div class="copy-row">
+            <input id="redirectUri" type="text" readonly />
+            <button id="copyRedirect" class="btn-secondary">Copiar</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="clientId">Client ID</label>
+          <input id="clientId" type="text" placeholder="Ex: 1234567890123456" />
+        </div>
+
+        <div class="field">
+          <label for="clientSecret">Client Secret (opcional, se seu app exigir)</label>
+          <input id="clientSecret" type="password" placeholder="Deixe em branco se o app usa PKCE puro" />
+        </div>
+
+        <div class="field">
+          <label for="siteId">País / Site do Mercado Livre</label>
+          <select id="siteId">
+            <option value="MLB">Brasil</option>
+            <option value="MLA">Argentina</option>
+            <option value="MLM">México</option>
+            <option value="MLC">Chile</option>
+            <option value="MCO">Colômbia</option>
+            <option value="MLU">Uruguai</option>
+            <option value="MPE">Peru</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="listingTypeId">Tipo de anúncio padrão</label>
+          <select id="listingTypeId">
+            <option value="gold_special">Clássico</option>
+            <option value="gold_pro">Premium</option>
+            <option value="free">Grátis (se disponível na sua conta)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="defaultCondition">Condição padrão</label>
+          <select id="defaultCondition">
+            <option value="new">Novo</option>
+            <option value="used">Usado</option>
+          </select>
+        </div>
+
+        <div class="account-status">
+          <span id="accountPill" class="pill warn">Desconectado</span>
+          <button id="connectBtn" class="btn-secondary">Conectar conta</button>
+          <button id="disconnectBtn" class="btn-danger" hidden>Desconectar</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2. IA para analisar as fotos (Anthropic / Claude)</h2>
+        <p class="muted">
+          Gere uma chave em <strong>console.anthropic.com</strong>. Ela fica
+          guardada apenas neste navegador.
+        </p>
+        <div class="field">
+          <label for="apiKey">Chave de API da Anthropic</label>
+          <input id="apiKey" type="password" placeholder="sk-ant-..." />
+        </div>
+        <div class="field">
+          <label for="model">Modelo</label>
+          <input id="model" type="text" value="claude-sonnet-5" />
+        </div>
+      </section>
+
+      <div class="save-row">
+        <button id="saveBtn" class="btn-primary">Salvar configurações</button>
+        <span id="saveMessage" class="muted"></span>
+      </div>
+
+      <div id="messageArea"></div>
+    </div>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
