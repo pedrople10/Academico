@@ -1,0 +1,18 @@
+{
+  "name": "photo-batch-editor",
+  "version": "1.0.0",
+  "description": "Editor de fotos em lote com ajustes automaticos e por prompt, com exportacao de presets/XMP para Adobe Lightroom Classic",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^4.21.2",
+    "multer": "^2.0.0",
+    "sharp": "^0.33.5"
+  }
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Batch Editor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Photo Batch Editor</h1>
+    <p>Edite varias fotos de uma vez: ajuste automatico por foto + refinamento por prompt de texto, com exportacao pronta para o Lightroom Classic.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls">
+      <div id="dropzone" class="dropzone">
+        <p><strong>Arraste suas fotos aqui</strong> ou clique para selecionar</p>
+        <p class="hint">JPEG/PNG, ate 60 fotos, 30MB cada</p>
+        <input id="fileInput" type="file" accept="image/*" multiple hidden />
+      </div>
+      <div id="fileList" class="file-list"></div>
+
+      <label for="prompt">O que essas fotos precisam?</label>
+      <textarea id="prompt" placeholder='Ex.: "mais quente, mais contraste e um pouco mais escuro" ou "preto e branco cinematic"'></textarea>
+
+      <div class="chips" id="chips">
+        <button type="button" class="chip" data-text="mais quente">mais quente</button>
+        <button type="button" class="chip" data-text="mais fria">mais fria</button>
+        <button type="button" class="chip" data-text="mais contraste">mais contraste</button>
+        <button type="button" class="chip" data-text="mais saturado e vibrante">vibrante</button>
+        <button type="button" class="chip" data-text="preto e branco">preto e branco</button>
+        <button type="button" class="chip" data-text="cinematic">cinematic</button>
+        <button type="button" class="chip" data-text="vintage">vintage</button>
+        <button type="button" class="chip" data-text="abrir sombras e recuperar luzes">recuperar sombras/luzes</button>
+      </div>
+
+      <label for="intensity">
+        Intensidade do ajuste automatico: <span id="intensityValue">100%</span>
+      </label>
+      <input id="intensity" type="range" min="0" max="150" value="100" />
+      <p class="hint">0% = usa so o prompt. 100% = correcao automatica normal. 150% = correcao mais forte.</p>
+
+      <button id="processBtn" class="primary" disabled>Processar fotos</button>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section class="panel results" id="resultsPanel" hidden>
+      <div class="results-header">
+        <h2>Resultado</h2>
+        <button id="downloadBtn" class="secondary">Baixar tudo (.zip com XMP + preset Lightroom)</button>
+      </div>
+      <p id="matchedRules" class="hint"></p>
+      <div id="resultsGrid" class="results-grid"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
