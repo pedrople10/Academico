@@ -40,8 +40,14 @@
 
   function addFiles(fileListLike) {
     const incoming = Array.from(fileListLike).filter((f) => f.type.startsWith('image/'));
+    if (incoming.length === 0) return;
     selectedFiles = selectedFiles.concat(incoming);
     refreshFileList();
+    // Edita automaticamente assim que as fotos sao soltas/selecionadas —
+    // nao precisa escrever prompt nem clicar em nada, o ajuste automatico
+    // ja roda sozinho. O prompt/intensidade continuam disponiveis para
+    // refinar depois com o botao "Processar fotos".
+    processPhotos();
   }
 
   dropzone.addEventListener('click', () => fileInput.click());
@@ -145,11 +151,11 @@
     resultsPanel.hidden = false;
   }
 
-  processBtn.addEventListener('click', async () => {
+  async function processPhotos() {
     if (selectedFiles.length === 0) return;
 
     processBtn.disabled = true;
-    setStatus(`Processando ${selectedFiles.length} foto(s)...`);
+    setStatus(`Editando ${selectedFiles.length} foto(s) automaticamente...`);
 
     const formData = new FormData();
     selectedFiles.forEach((file) => formData.append('photos', file));
@@ -166,13 +172,15 @@
 
       currentSessionId = data.sessionId;
       renderResults(data);
-      setStatus(`Pronto! ${data.photos.length} foto(s) processada(s).`, 'ok');
+      setStatus(`Pronto! ${data.photos.length} foto(s) editada(s) automaticamente.`, 'ok');
     } catch (err) {
       setStatus(err.message, 'error');
     } finally {
       processBtn.disabled = selectedFiles.length === 0;
     }
-  });
+  }
+
+  processBtn.addEventListener('click', () => processPhotos());
 
   downloadBtn.addEventListener('click', () => {
     if (!currentSessionId) return;
