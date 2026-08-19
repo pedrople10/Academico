@@ -12,9 +12,17 @@
   const resultsGrid = document.getElementById('resultsGrid');
   const matchedRulesEl = document.getElementById('matchedRules');
   const downloadBtn = document.getElementById('downloadBtn');
+  const ruleMatchEl = document.getElementById('ruleMatch');
+  const ruleExposureEl = document.getElementById('ruleExposure');
+  const ruleExposureValueEl = document.getElementById('ruleExposureValue');
+  const ruleContrastEl = document.getElementById('ruleContrast');
+  const ruleContrastValueEl = document.getElementById('ruleContrastValue');
+  const addRuleBtn = document.getElementById('addRuleBtn');
+  const rulesListEl = document.getElementById('rulesList');
 
   let selectedFiles = [];
   let currentSessionId = null;
+  let customRules = [];
 
   function refreshFileList() {
     fileListEl.innerHTML = '';
@@ -82,6 +90,58 @@
     intensityValueEl.textContent = `${intensityEl.value}%`;
   });
 
+  ruleExposureEl.addEventListener('input', () => {
+    ruleExposureValueEl.textContent = ruleExposureEl.value;
+  });
+  ruleContrastEl.addEventListener('input', () => {
+    ruleContrastValueEl.textContent = ruleContrastEl.value;
+  });
+
+  function renderRulesList() {
+    rulesListEl.innerHTML = '';
+    customRules.forEach((rule, idx) => {
+      const row = document.createElement('div');
+      const label = document.createElement('span');
+      const parts = [];
+      if (rule.exposureEV !== 0) parts.push(`brilho ${rule.exposureEV > 0 ? '+' : ''}${rule.exposureEV.toFixed(2)}`);
+      if (rule.contrast !== 0) parts.push(`contraste ${rule.contrast > 0 ? '+' : ''}${rule.contrast}`);
+      label.textContent = `Termina em "${rule.match}": ${parts.join(', ') || 'sem alteracao'}`;
+      const remove = document.createElement('a');
+      remove.textContent = 'remover';
+      remove.href = '#';
+      remove.style.color = '#ff8080';
+      remove.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        customRules.splice(idx, 1);
+        renderRulesList();
+        if (selectedFiles.length > 0) processPhotos();
+      });
+      row.appendChild(label);
+      row.appendChild(remove);
+      rulesListEl.appendChild(row);
+    });
+  }
+
+  addRuleBtn.addEventListener('click', () => {
+    const match = ruleMatchEl.value.trim();
+    if (!match) {
+      setStatus('Escreva o final do nome do arquivo para criar a regra (ex.: 69).', 'error');
+      return;
+    }
+    const exposureEV = (Number(ruleExposureEl.value) / 100) * 1.5;
+    const contrast = Number(ruleContrastEl.value);
+    customRules.push({ match, exposureEV, contrast });
+    renderRulesList();
+
+    ruleMatchEl.value = '';
+    ruleExposureEl.value = 0;
+    ruleContrastEl.value = 0;
+    ruleExposureValueEl.textContent = '0';
+    ruleContrastValueEl.textContent = '0';
+
+    if (selectedFiles.length > 0) processPhotos();
+  });
+
   function setStatus(message, kind) {
     statusEl.textContent = message || '';
     statusEl.className = `status ${kind || ''}`.trim();
@@ -126,7 +186,9 @@
       filename.textContent = photo.originalName;
       const tagsWrap = document.createElement('div');
       tagsWrap.className = 'adjustments';
-      adjustmentTags(photo.adjustment).forEach((t) => {
+      const tags = adjustmentTags(photo.adjustment);
+      if (photo.matchedCustomRule) tags.push(`Regra: termina em "${photo.matchedCustomRule}"`);
+      tags.forEach((t) => {
         const tag = document.createElement('span');
         tag.className = 'tag';
         tag.textContent = t;
@@ -161,6 +223,7 @@
     selectedFiles.forEach((file) => formData.append('photos', file));
     formData.append('prompt', promptEl.value);
     formData.append('autoIntensity', intensityEl.value);
+    formData.append('customRules', JSON.stringify(customRules));
 
     try {
       const response = await fetch('/api/process', { method: 'POST', body: formData });

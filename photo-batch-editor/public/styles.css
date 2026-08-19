@@ -96,6 +96,51 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.rule-form {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-top: 6px;
+}
+
+.rule-form input[type="text"] {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.rule-slider-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 8px 0 2px;
+}
+
+.rule-form button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.rules-list {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.rules-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
 label {
   display: block;
   margin: 16px 0 6px;

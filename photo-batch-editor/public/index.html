@@ -9,19 +9,19 @@
 <body>
   <header class="topbar">
     <h1>Photo Batch Editor</h1>
-    <p>Edite varias fotos de uma vez: ajuste automatico por foto + refinamento por prompt de texto, com exportacao pronta para o Lightroom Classic.</p>
+    <p>Solte varias fotos e a IA ja edita todas automaticamente, sem precisar escolher nada. Se quiser um resultado diferente, descreva num prompt (opcional) e reprocesse.</p>
   </header>
 
   <main class="layout">
     <section class="panel controls">
       <div id="dropzone" class="dropzone">
         <p><strong>Arraste suas fotos aqui</strong> ou clique para selecionar</p>
-        <p class="hint">JPEG/PNG, ate 60 fotos, 30MB cada</p>
+        <p class="hint">A edicao automatica comeca sozinha assim que voce soltar as fotos. JPEG/PNG, ate 300 fotos, 30MB cada</p>
         <input id="fileInput" type="file" accept="image/*" multiple hidden />
       </div>
       <div id="fileList" class="file-list"></div>
 
-      <label for="prompt">O que essas fotos precisam?</label>
+      <label for="prompt">Quer um resultado diferente do automatico? (opcional)</label>
       <textarea id="prompt" placeholder='Ex.: "mais quente, mais contraste e um pouco mais escuro" ou "preto e branco cinematic"'></textarea>
 
       <div class="chips" id="chips">
@@ -41,7 +41,23 @@
       <input id="intensity" type="range" min="0" max="150" value="100" />
       <p class="hint">0% = usa so o prompt. 100% = correcao automatica normal. 150% = correcao mais forte.</p>
 
-      <button id="processBtn" class="primary" disabled>Processar fotos</button>
+      <label>Ajuste especial so para algumas fotos (opcional)</label>
+      <p class="hint">Ex.: fotos cujo nome termina em "69" recebem um brilho/contraste diferente do resto do lote.</p>
+      <div class="rule-form">
+        <input type="text" id="ruleMatch" placeholder='Nome termina com (ex.: 69)' />
+        <label class="rule-slider-label">
+          Brilho <span id="ruleExposureValue">0</span>
+          <input type="range" id="ruleExposure" min="-100" max="100" value="0" />
+        </label>
+        <label class="rule-slider-label">
+          Contraste <span id="ruleContrastValue">0</span>
+          <input type="range" id="ruleContrast" min="-100" max="100" value="0" />
+        </label>
+        <button type="button" id="addRuleBtn" class="secondary">Adicionar regra</button>
+      </div>
+      <div id="rulesList" class="rules-list"></div>
+
+      <button id="processBtn" class="primary" disabled>Reprocessar fotos</button>
       <p id="status" class="status"></p>
     </section>
 

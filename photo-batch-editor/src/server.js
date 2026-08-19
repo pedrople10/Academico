@@ -13,11 +13,12 @@ const {
 } = require('./imageProcessor');
 const { buildSidecarXmp, buildDevelopPresetXmp } = require('./xmpExporter');
 const { createSession, getSession } = require('./sessionStore');
+const { clampAdjustment } = require('./adjustments/types');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const MAX_FILES = 60;
+const MAX_FILES = 300;
 const MAX_FILE_SIZE_BYTES = 30 * 1024 * 1024; // 30MB por foto
 
 const upload = multer({
@@ -40,6 +41,57 @@ function sanitizeBaseName(originalName) {
   const withoutExt = base.replace(/\.[^.]+$/, '');
   const cleaned = withoutExt.replace(/[^a-zA-Z0-9_\-. ]/g, '_').trim();
   return cleaned || 'foto';
+}
+
+const MAX_CUSTOM_RULES = 50;
+
+// Regras opcionais tipo "fotos cujo nome termina em X recebem esse
+// brilho/contraste extra" (ex.: nome termina em "69"). Vem do front-end
+// como JSON no campo customRules do form-data.
+function parseCustomRules(raw) {
+  if (!raw) return [];
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed
+    .slice(0, MAX_CUSTOM_RULES)
+    .map((r) => ({
+      match: typeof r.match === 'string' ? r.match.trim() : '',
+      exposureEV: Number(r.exposureEV) || 0,
+      contrast: Number(r.contrast) || 0,
+    }))
+    .filter((r) => r.match.length > 0);
+}
+
+function ruleMatchesFile(originalName, matchText) {
+  const base = path.basename(originalName || '').replace(/\.[^.]+$/, '');
+  return base.toLowerCase().endsWith(matchText.toLowerCase());
+}
+
+// Aplica, por cima do ajuste automatico+prompt ja calculado, o
+// brilho/contraste extra de toda regra cujo padrao bate com o final do
+// nome do arquivo (sem extensao). Varias regras podem se acumular na
+// mesma foto.
+function applyCustomRules(adjustment, originalName, rules) {
+  let result = adjustment;
+  let matchedRule = null;
+
+  for (const rule of rules) {
+    if (!ruleMatchesFile(originalName, rule.match)) continue;
+    matchedRule = rule.match;
+    result = {
+      ...result,
+      exposureEV: result.exposureEV + rule.exposureEV,
+      contrast: result.contrast + rule.contrast,
+    };
+  }
+
+  return { adjustment: clampAdjustment(result), matchedRule };
 }
 
 function averageAdjustment(adjustments) {
@@ -94,6 +146,16 @@ function averageAdjustment(adjustments) {
 app.post('/api/process', (req, res) => {
   upload.array('photos', MAX_FILES)(req, res, async (err) => {
     if (err) {
+      if (err.code === 'LIMIT_FILE_COUNT') {
+        return res.status(400).json({
+          error: `Voce enviou fotos demais de uma vez. O limite e ${MAX_FILES} fotos por lote — separe em grupos menores.`,
+        });
+      }
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          error: `Uma das fotos passa do tamanho maximo permitido (${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB).`,
+        });
+      }
       return res.status(400).json({ error: err.message });
     }
 
@@ -107,6 +169,7 @@ app.post('/api/process', (req, res) => {
     const autoIntensity = Number.isFinite(autoIntensityRaw) ? autoIntensityRaw : 100;
 
     const { adjustment: promptAdjustment, matchedRules } = interpretPrompt(promptText);
+    const customRules = parseCustomRules(req.body.customRules);
 
     try {
       const processed = [];
@@ -114,7 +177,12 @@ app.post('/api/process', (req, res) => {
 
       for (const file of files) {
         const autoAdjustment = await analyzeImage(file.buffer);
-        const finalAdjustment = mergeAdjustments(autoAdjustment, promptAdjustment, autoIntensity);
+        const mergedAdjustment = mergeAdjustments(autoAdjustment, promptAdjustment, autoIntensity);
+        const { adjustment: finalAdjustment, matchedRule: matchedCustomRule } = applyCustomRules(
+          mergedAdjustment,
+          file.originalname,
+          customRules
+        );
         finalAdjustments.push(finalAdjustment);
 
         const [beforeDataUrl, afterDataUrl, editedBuffer] = await Promise.all([
@@ -135,6 +203,7 @@ app.post('/api/process', (req, res) => {
           editedBuffer,
           xmp: buildSidecarXmp(finalAdjustment),
           adjustment: finalAdjustment,
+          matchedCustomRule,
         });
       }
 
@@ -160,6 +229,7 @@ app.post('/api/process', (req, res) => {
           originalName: p.originalName,
           beforeDataUrl: p.beforeDataUrl,
           afterDataUrl: p.afterDataUrl,
+          matchedCustomRule: p.matchedCustomRule,
           adjustment: {
             exposureEV: Number(p.adjustment.exposureEV.toFixed(2)),
             contrast: Math.round(p.adjustment.contrast),
