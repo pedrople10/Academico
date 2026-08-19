@@ -1,0 +1,38 @@
+@model IEnumerable<Academico.Models.CasaAposta>
+@{
+    ViewData["Title"] = "Casas de Apostas";
+    var saldoTotal = (decimal)(ViewData["SaldoTotal"] ?? 0m);
+}
+
+<h1>Casas de Apostas</h1>
+
+<div class="alert alert-info">
+    <strong>Saldo total:</strong> @saldoTotal.ToString("C")
+</div>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Nova Casa de Aposta</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Nome)</th>
+            <th>@Html.DisplayNameFor(model => model.Saldo)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+            <td>@item.Saldo.ToString("C")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Excluir</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

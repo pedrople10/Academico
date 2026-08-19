@@ -1,0 +1,18 @@
+@model Academico.Models.CasaAposta
+@{
+    ViewData["Title"] = "Detalhes da Casa de Aposta";
+}
+
+<h1>Detalhes</h1>
+<h4>Casa de Aposta</h4>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nome)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.Nome)</dd>
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Saldo)</dt>
+    <dd class="col-sm-10">@Model?.Saldo.ToString("C")</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</div>
