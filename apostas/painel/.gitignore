@@ -1,0 +1,5 @@
+# nada com dado real deve entrar no repositório
+backup*.json
+painel-backup-*.json
+nuvem.json
+*.local.html
