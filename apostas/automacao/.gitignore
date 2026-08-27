@@ -1,0 +1,15 @@
+# A secret key do Supabase ignora o RLS — nunca suba isso.
+nuvem.json
+
+# Dados e memória locais (contas reais, saldos, portas dos seus perfis)
+profiles.json
+saldos.json
+saldos.csv
+aprendizado.json
+aprendizado_apostas.json
+varredura_em_andamento.json
+historico.json
+__pycache__/
+
+# Pastas de dados dos perfis do Opera (cookies e login de cada conta)
+perfis-opera/

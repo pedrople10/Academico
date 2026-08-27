@@ -1,0 +1,5 @@
+{
+  "_leia": "Renomeie para nuvem.json e preencha. NUNCA suba este arquivo para o GitHub.",
+  "supabase_url": "https://SEUPROJETO.supabase.co",
+  "supabase_key": "COLE_AQUI_A_SECRET_KEY_DO_SUPABASE"
+}

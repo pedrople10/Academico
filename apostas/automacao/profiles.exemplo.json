@@ -1,0 +1,21 @@
+[
+  {
+    "nome": "Você",
+    "porta": 9222,
+    "usuario_painel": "",
+    "proxy": "",
+    "casas": [
+      "exemplo-a.bet.br",
+      "exemplo-b.bet.br"
+    ]
+  },
+  {
+    "nome": "Perfil 2",
+    "porta": 9223,
+    "usuario_painel": "Perfil 2",
+    "proxy": "",
+    "casas": [
+      "exemplo-a.bet.br"
+    ]
+  }
+]
