@@ -57,8 +57,12 @@ Security do `schema.sql`, que só deixa cada usuário ler a própria linha.
 
 ### 3. Publicar
 
-GitHub Pages, Vercel ou Netlify — é um site estático. No GitHub:
-**Settings → Pages → Deploy from a branch → main → / (root)**.
+GitHub Pages, Vercel ou Netlify — é um site estático.
+
+Este repositório já traz `.github/workflows/deploy-painel.yml`, que publica
+`apostas/painel/` no GitHub Pages sozinho a cada push na `master`. Só falta
+ativar uma vez: **Settings → Pages → Source: GitHub Actions**. Depois disso,
+qualquer alteração no painel é publicada automaticamente.
 
 ### 4. Usar
 
