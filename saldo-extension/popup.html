@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<title>Saldo Total</title>
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <h1>Saldo Total</h1>
+
+  <div id="total" class="total">R$ 0,00</div>
+  <div class="hint">Atualiza sozinho conforme voce navega nas casas de apostas.</div>
+
+  <button id="openDashboardBtn" class="btn primary">Abrir painel completo numa aba</button>
+
+  <div id="pendingSection"></div>
+
+  <button id="scanBtn" class="btn">Ler saldo desta aba agora</button>
+  <div id="scanStatus" class="status"></div>
+  <div id="candidates" class="candidates"></div>
+
+  <h2>Casas salvas</h2>
+  <table id="housesTable">
+    <thead>
+      <tr><th>Casa</th><th>Saldo</th><th></th></tr>
+    </thead>
+    <tbody id="housesBody"></tbody>
+  </table>
+
+  <details>
+    <summary>Adicionar/editar manualmente</summary>
+    <div class="manual-form">
+      <input id="manualHost" type="text" placeholder="Nome da casa (ex: Bet365)" />
+      <input id="manualValue" type="text" placeholder="Saldo (ex: 123,45)" />
+      <button id="manualSaveBtn" class="btn">Salvar</button>
+    </div>
+  </details>
+
+  <script src="popup.js"></script>
+</body>
+</html>

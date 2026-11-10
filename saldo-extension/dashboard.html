@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<title>Painel de Saldo - Casas de Apostas</title>
+<link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Saldo Total</h1>
+      <div id="updatedAt" class="updated-at"></div>
+    </header>
+
+    <div id="total" class="total">R$ 0,00</div>
+
+    <div id="pendingSection"></div>
+
+    <section class="card">
+      <h2>Casas salvas</h2>
+      <table id="housesTable">
+        <thead>
+          <tr><th>Casa</th><th>Saldo</th><th></th></tr>
+        </thead>
+        <tbody id="housesBody"></tbody>
+      </table>
+      <p id="emptyMsg" class="empty-msg" hidden>Nenhuma casa salva ainda. Navegue nas casas de apostas logado que a extensao le sozinha, ou adicione manualmente abaixo.</p>
+    </section>
+
+    <section class="card">
+      <h2>Adicionar / editar manualmente</h2>
+      <div class="manual-form">
+        <input id="manualHost" type="text" placeholder="Nome da casa (ex: Bet365)" />
+        <input id="manualValue" type="text" placeholder="Saldo (ex: 123,45)" />
+        <button id="manualSaveBtn" class="btn primary">Salvar</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
