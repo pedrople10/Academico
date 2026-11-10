@@ -1,6 +1,30 @@
 const sharp = require('sharp');
 const { clamp } = require('./adjustments/types');
 
+// Menos memoria no servidor (importante no plano gratuito do Render, 512MB).
+sharp.cache(false);
+
+// Abre a foto ja auto-orientada (EXIF) e garantindo 3 canais RGB.
+// Fotos em escala de cinza (1 canal) quebram o .linear() por canal
+// ("Band expansion using linear is unsupported") e a analise automatica,
+// entao elas sao convertidas para sRGB numa passada previa em raw.
+// `input` pode ser um Buffer ou o caminho de um arquivo.
+async function openRgb(input) {
+  const meta = await sharp(input).metadata();
+  if ((meta.channels || 3) >= 3) {
+    return { image: sharp(input).rotate(), keepMetadata: true };
+  }
+  const { data, info } = await sharp(input)
+    .rotate()
+    .toColourspace('srgb')
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  return {
+    image: sharp(data, { raw: { width: info.width, height: info.height, channels: info.channels } }),
+    keepMetadata: false,
+  };
+}
+
 // Converte o AdjustmentSet (exposicao/contraste/temperatura/tint) em uma
 // unica transformacao linear por canal: out = mul[c] * in + offset[c].
 // Isso evita varias passadas de processamento e mantem o pipeline rapido.
@@ -33,10 +57,11 @@ function computeGamma(adj) {
   return clamp(gamma, 1, 2.5);
 }
 
-async function applyAdjustments(inputBuffer, adjustment, { maxWidth } = {}) {
+async function applyAdjustments(input, adjustment, { maxWidth } = {}) {
   const { mul, offset } = computeLinearParams(adjustment);
 
-  let pipeline = sharp(inputBuffer).rotate(); // auto-orienta pelo EXIF
+  const { image, keepMetadata } = await openRgb(input);
+  let pipeline = image;
 
   if (maxWidth) {
     pipeline = pipeline.resize({ width: maxWidth, withoutEnlargement: true });
@@ -61,17 +86,21 @@ async function applyAdjustments(inputBuffer, adjustment, { maxWidth } = {}) {
     pipeline = pipeline.modulate({ saturation: saturationMul });
   }
 
-  return pipeline.withMetadata().jpeg({ quality: 90, mozjpeg: true }).toBuffer();
+  if (keepMetadata) pipeline = pipeline.withMetadata();
+  // Fundo branco para PNGs transparentes (JPEG nao tem canal alfa).
+  pipeline = pipeline.flatten({ background: '#ffffff' });
+  return pipeline.jpeg({ quality: 90, mozjpeg: true }).toBuffer();
 }
 
-async function buildPreviewDataUrl(buffer, adjustment) {
-  const editedThumb = await applyAdjustments(buffer, adjustment, { maxWidth: 480 });
+async function buildPreviewDataUrl(input, adjustment) {
+  const editedThumb = await applyAdjustments(input, adjustment, { maxWidth: 480 });
   return `data:image/jpeg;base64,${editedThumb.toString('base64')}`;
 }
 
-async function buildOriginalPreviewDataUrl(buffer) {
-  const thumb = await sharp(buffer)
+async function buildOriginalPreviewDataUrl(input) {
+  const thumb = await sharp(input)
     .rotate()
+    .flatten({ background: '#ffffff' })
     .resize({ width: 480, withoutEnlargement: true })
     .jpeg({ quality: 85 })
     .toBuffer();
@@ -79,6 +108,7 @@ async function buildOriginalPreviewDataUrl(buffer) {
 }
 
 module.exports = {
+  openRgb,
   applyAdjustments,
   buildPreviewDataUrl,
   buildOriginalPreviewDataUrl,

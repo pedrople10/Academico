@@ -1,11 +1,25 @@
 const sharp = require('sharp');
 const { clamp, emptyAdjustment } = require('./types');
 
+// Reduz a foto para analise: as estatisticas de uma versao de ~512px sao
+// praticamente iguais as da foto inteira e gastam muito menos memoria/CPU.
+// Tambem garante 3 canais sRGB sem alfa (fotos P&B tem 1 canal so).
+async function loadAnalysisBuffer(input) {
+  return sharp(input)
+    .rotate()
+    .resize({ width: 512, height: 512, fit: 'inside', withoutEnlargement: true })
+    .removeAlpha()
+    .toColourspace('srgb')
+    .png()
+    .toBuffer();
+}
+
 // Analisa a foto (histograma/estatisticas por canal) e propoe um AdjustmentSet
 // automatico: exposicao, contraste, balanco de branco (metodo "gray world")
 // e saturacao. E uma correcao heuristica, nao colorimetricamente exata, mas
 // e calculada a partir dos pixels reais de cada foto (nao e um valor fixo).
-async function analyzeImage(buffer) {
+async function analyzeImage(input) {
+  const buffer = await loadAnalysisBuffer(input);
   const image = sharp(buffer);
   const stats = await image.stats();
   const [rC, gC, bC] = stats.channels;

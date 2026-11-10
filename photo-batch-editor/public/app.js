@@ -23,6 +23,23 @@
   let selectedFiles = [];
   let currentSessionId = null;
   let customRules = [];
+  // Cada envio ganha um numero; se o usuario soltar mais fotos enquanto o
+  // lote anterior ainda processa, a resposta antiga e descartada.
+  let requestSeq = 0;
+  let limits = { maxFiles: 300, maxFileSizeMB: 30 };
+
+  fetch('/api/config')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((cfg) => {
+      if (!cfg) return;
+      limits = cfg;
+      document.getElementById('limitsText').textContent = `${cfg.maxFiles} fotos, ${cfg.maxFileSizeMB}MB cada`;
+    })
+    .catch(() => {});
+
+  function fileKey(file) {
+    return `${file.name}|${file.size}|${file.lastModified}`;
+  }
 
   function refreshFileList() {
     fileListEl.innerHTML = '';
@@ -38,6 +55,13 @@
         ev.preventDefault();
         selectedFiles.splice(idx, 1);
         refreshFileList();
+        if (selectedFiles.length === 0) {
+          resultsPanel.hidden = true;
+          currentSessionId = null;
+          setStatus('');
+        } else {
+          setStatus('Lista alterada. Clique em "Reprocessar fotos" para atualizar o resultado.');
+        }
       });
       row.appendChild(name);
       row.appendChild(remove);
@@ -47,7 +71,20 @@
   }
 
   function addFiles(fileListLike) {
-    const incoming = Array.from(fileListLike).filter((f) => f.type.startsWith('image/'));
+    const known = new Set(selectedFiles.map(fileKey));
+    const tooBig = [];
+    const incoming = Array.from(fileListLike).filter((f) => {
+      if (!f.type.startsWith('image/') || known.has(fileKey(f))) return false;
+      if (f.size > limits.maxFileSizeMB * 1024 * 1024) {
+        tooBig.push(f.name);
+        return false;
+      }
+      known.add(fileKey(f));
+      return true;
+    });
+    if (tooBig.length > 0) {
+      setStatus(`Ignorada(s) por passar de ${limits.maxFileSizeMB}MB: ${tooBig.join(', ')}`, 'error');
+    }
     if (incoming.length === 0) return;
     selectedFiles = selectedFiles.concat(incoming);
     refreshFileList();
@@ -204,6 +241,13 @@
       resultsGrid.appendChild(card);
     });
 
+    if (data.failed && data.failed.length > 0) {
+      const failedNote = document.createElement('p');
+      failedNote.className = 'status error';
+      failedNote.textContent = `Nao foi possivel ler: ${data.failed.join(', ')} (formato nao suportado ou arquivo corrompido).`;
+      resultsGrid.prepend(failedNote);
+    }
+
     if (data.matchedRules && data.matchedRules.length > 0) {
       matchedRulesEl.textContent = `Prompt interpretado: ${data.matchedRules.join(', ')}`;
     } else {
@@ -215,7 +259,15 @@
 
   async function processPhotos() {
     if (selectedFiles.length === 0) return;
+    if (selectedFiles.length > limits.maxFiles) {
+      setStatus(
+        `Voce selecionou ${selectedFiles.length} fotos, mas o limite e ${limits.maxFiles} por lote. Remova algumas.`,
+        'error'
+      );
+      return;
+    }
 
+    const seq = ++requestSeq;
     processBtn.disabled = true;
     setStatus(`Editando ${selectedFiles.length} foto(s) automaticamente...`);
 
@@ -227,19 +279,36 @@
 
     try {
       const response = await fetch('/api/process', { method: 'POST', body: formData });
-      const data = await response.json();
+      // Erros de proxy/plataforma (ex.: 502 do Render, 413) vem em HTML,
+      // nao em JSON — nao deixa isso virar "Unexpected token <".
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+      if (seq !== requestSeq) return;
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Falha ao processar as fotos.');
+      if (!response.ok || !data) {
+        throw new Error(
+          (data && data.error) ||
+            `Falha ao processar as fotos (erro ${response.status}). Tente um lote menor.`
+        );
       }
 
       currentSessionId = data.sessionId;
       renderResults(data);
-      setStatus(`Pronto! ${data.photos.length} foto(s) editada(s) automaticamente.`, 'ok');
+      const failedCount = (data.failed || []).length;
+      setStatus(
+        `Pronto! ${data.photos.length} foto(s) editada(s) automaticamente.` +
+          (failedCount ? ` ${failedCount} nao puderam ser lidas.` : ''),
+        failedCount ? 'error' : 'ok'
+      );
     } catch (err) {
-      setStatus(err.message, 'error');
+      if (seq !== requestSeq) return;
+      setStatus(err.message || 'Falha de conexao com o servidor.', 'error');
     } finally {
-      processBtn.disabled = selectedFiles.length === 0;
+      if (seq === requestSeq) processBtn.disabled = selectedFiles.length === 0;
     }
   }
 
