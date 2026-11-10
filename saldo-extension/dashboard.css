@@ -1,0 +1,161 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+  background: #f4f6fb;
+  margin: 0;
+  padding: 24px;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.updated-at {
+  font-size: 12px;
+  color: #888;
+}
+
+.total {
+  font-size: 40px;
+  font-weight: 800;
+  background: #fff;
+  border: 1px solid #d7e0ff;
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(47, 91, 234, 0.08);
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: #444;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 4px;
+  border-bottom: 1px solid #eee;
+}
+
+td.value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.empty-msg {
+  font-size: 13px;
+  color: #888;
+}
+
+button.remove, button.edit {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+button.remove { color: #c0392b; }
+button.edit { color: #2f5bea; }
+
+.pending-block {
+  border: 1px solid #f2c94c;
+  background: #fffbea;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.pending-block .pending-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.candidate {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  background: #fff;
+}
+
+.candidate:hover {
+  border-color: #2f5bea;
+  background: #f7f9ff;
+}
+
+.candidate .ctx {
+  color: #888;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+.manual-form {
+  display: flex;
+  gap: 8px;
+}
+
+.manual-form input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn.primary {
+  background: #2f5bea;
+  color: #fff;
+  border-color: #2f5bea;
+}
