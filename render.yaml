@@ -1,0 +1,22 @@
+# Blueprint do Render para o Photo Batch Editor.
+# No Render: New + > Blueprint > escolha este repositorio. O servico e
+# criado e publicado automaticamente a cada push na branch padrao.
+services:
+  - type: web
+    name: photo-batch-editor
+    runtime: node
+    plan: free
+    rootDir: photo-batch-editor
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # O plano gratuito tem 512MB de RAM e disco temporario: limites
+      # menores que o padrao local (300 fotos / 30MB) evitam quedas.
+      - key: MAX_FILES
+        value: "100"
+      - key: MAX_FILE_SIZE_MB
+        value: "25"
